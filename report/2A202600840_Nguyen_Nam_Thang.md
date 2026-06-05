@@ -67,12 +67,12 @@ Bộ FAQ Viettel có cấu trúc rõ theo dạng câu hỏi/trả lời, rất p
 
 | # | Tên tài liệu | Nguồn | Số ký tự | Metadata đã gán |
 |---|--------------|-------|----------|-----------------|
-| 1 | Viettel - Business Service FAQs.md | Local `data/` | 42,513 | `doc_id=viettel_business_service_faqs`, `domain=business`, `source=Viettel - Business Service FAQs.md` |
-| 2 | Viettel - Digital Application FAQs.md | Local `data/` | 13,724 | `doc_id=viettel_digital_application_faqs`, `domain=digital`, `source=Viettel - Digital Application FAQs.md` |
-| 3 | Viettel - Internet - TV FAQs.md | Local `data/` | 67,696 | `doc_id=viettel_internet_tv_faqs`, `domain=internet`, `source=Viettel - Internet - TV FAQs.md` |
-| 4 | Viettel - Mobile FAQs.md | Local `data/` | 66,587 | `doc_id=viettel_mobile_faqs`, `domain=mobile`, `source=Viettel - Mobile FAQs.md` |
-| 5 | Viettel - MyViettel FAQs.md | Local `data/` | 18,992 | `doc_id=viettel_myviettel_faqs`, `domain=digital`, `source=Viettel - MyViettel FAQs.md` |
-| 6 | Viettel - Shop Viettet FAQs.md | Local `data/` | 4,452 | `doc_id=viettel_shop_faqs`, `domain=shop`, `source=Viettel - Shop Viettet FAQs.md` |
+| 1 | Viettel - Business Service FAQs.md | vietteltelecom.vn | 42,513 | `doc_id=viettel_business_service_faqs`, `domain=business`, `source=Viettel - Business Service FAQs.md` |
+| 2 | Viettel - Digital Application FAQs.md | vietteltelecom.vn | 13,724 | `doc_id=viettel_digital_application_faqs`, `domain=digital`, `source=Viettel - Digital Application FAQs.md` |
+| 3 | Viettel - Internet - TV FAQs.md | vietteltelecom.vn | 67,696 | `doc_id=viettel_internet_tv_faqs`, `domain=internet`, `source=Viettel - Internet - TV FAQs.md` |
+| 4 | Viettel - Mobile FAQs.md | vietteltelecom.vn | 66,587 | `doc_id=viettel_mobile_faqs`, `domain=mobile`, `source=Viettel - Mobile FAQs.md` |
+| 5 | Viettel - MyViettel FAQs.md | vietteltelecom.vn | 18,992 | `doc_id=viettel_myviettel_faqs`, `domain=digital`, `source=Viettel - MyViettel FAQs.md` |
+| 6 | Viettel - Shop Viettet FAQs.md | vietteltelecom.vn | 4,452 | `doc_id=viettel_shop_faqs`, `domain=shop`, `source=Viettel - Shop Viettet FAQs.md` |
 
 ### Metadata Schema
 
@@ -105,7 +105,7 @@ Số liệu baseline dưới đây lấy từ 3 strategy có sẵn trong compara
 
 ### Strategy Của Tôi
 
-**Loại:** Custom strategy - `MarkdownStructureChunker`
+**Loại:** Custom strategy - `document-structure-chunking`
 
 **Mô tả cách hoạt động:**  
 Strategy này tách Markdown theo heading `#`, `##`, `###` trước. Với FAQ Viettel, mỗi câu hỏi thường là heading `### Q: ...`, câu trả lời nằm ngay bên dưới. Vì vậy mỗi section Q/A được giữ thành một chunk tự nhiên. Nếu section quá dài so với `chunk_size`, strategy fallback sang `RecursiveChunker` nhưng vẫn thêm dòng context `[Markdown path: ...]` vào content của subchunk.
@@ -135,11 +135,11 @@ class MarkdownStructureChunker:
 | Tài liệu | Strategy | Chunk Count | Avg Length | Retrieval Quality? |
 |-----------|----------|-------------|------------|--------------------|
 | MyViettel FAQs | best baseline: RecursiveChunker (`recursive`) | 21 | 889.9 | Ít chunk hơn, nhưng chưa hiểu ranh giới từng câu hỏi FAQ |
-| MyViettel FAQs | **của tôi: MarkdownStructureChunker** | 36 | 589.6 | Tốt hơn cho FAQ vì mỗi chunk bám theo heading câu hỏi |
+| MyViettel FAQs | **của tôi: document-structure-chunking** | 36 | 589.6 | Tốt hơn cho FAQ vì mỗi chunk bám theo heading câu hỏi |
 | Mobile FAQs | best baseline: RecursiveChunker (`recursive`) | 76 | 864.6 | Cân bằng, nhưng có thể gom nhiều Q/A vào cùng chunk |
-| Mobile FAQs | **của tôi: MarkdownStructureChunker** | 150 | 463.1 | Nhiều chunk hơn, nhưng mỗi chunk gần với một Q/A nên dễ truy vết |
+| Mobile FAQs | **của tôi: document-structure-chunking** | 150 | 463.1 | Nhiều chunk hơn, nhưng mỗi chunk gần với một Q/A nên dễ truy vết |
 | Internet-TV FAQs | best baseline: RecursiveChunker (`recursive`) | 79 | 848.0 | Tốt cho đoạn dài, nhưng không gắn section title |
-| Internet-TV FAQs | **của tôi: MarkdownStructureChunker** | 149 | 489.8 | Trace source bằng `source` và `chunk_index`, phù hợp khi cần hiển thị nguồn tối giản |
+| Internet-TV FAQs | **của tôi: document-structure-chunking** | 149 | 489.8 | Trace source bằng `source` và `chunk_index`, phù hợp khi cần hiển thị nguồn tối giản |
 
 ### So Sánh Với Thành Viên Khác
 
@@ -147,7 +147,7 @@ class MarkdownStructureChunker:
 |-----------|----------|----------------------|-----------|----------|
 | 2A202600934 - Trần Trúc Quỳnh |  |  |  |  |
 | 2A202600855 - Nguyễn Tiến Huân |  |  |  |  |
-| 2A202600840 - Nguyễn Nam Thắng | MarkdownStructureChunker + metadata filter | 9/10 trên 5 benchmark queries với OpenAI embeddings | Giữ cấu trúc FAQ, nguồn rõ, 5/5 query có chunk đúng trong top-3 | Tạo nhiều chunk hơn recursive baseline; một query cần top-3 mới thấy đủ cú pháp SMS |
+| 2A202600840 - Nguyễn Nam Thắng | document-structure-chunking + metadata filter | 9/10  | Giữ cấu trúc FAQ, nguồn rõ, 5/5 query có chunk đúng trong top-3 | Tạo nhiều chunk hơn recursive baseline; một query cần top-3 mới thấy đủ cú pháp SMS |
 | 2A202600663 - Phạm Huy Cảnh |  |  |  |  |
 | 2A202600810 - Nguyễn Xuân Tới |  |  |  |  |
 | 2A202600575 - Phạm Thị Bích Ngọc |  |  |  |  |
@@ -167,8 +167,8 @@ Tôi dùng regex `(?<=[.!?])\s+` để tách câu theo dấu kết thúc câu r�
 **`RecursiveChunker.chunk` / `_split` — approach:**  
 Thuật toán thử separator theo thứ tự `\n\n`, `\n`, `. `, space, rồi fallback fixed-size. Base case là text rỗng hoặc độ dài nhỏ hơn `chunk_size`. Nếu một phần vẫn quá dài, hàm gọi đệ quy với separator nhỏ hơn.
 
-**`MarkdownStructureChunker` — approach:**  
-Tôi thêm custom chunker cho Markdown bằng cách parse heading `#` đến `######`. Mỗi section Q/A được giữ thành chunk tự nhiên; nếu section quá dài thì fallback sang recursive split và thêm context Markdown path trực tiếp vào content.
+**`document-structure-chunking` — approach:**  
+Tôi thêm custom chunker cho Markdown bằng class `MarkdownStructureChunker`, parse heading `#` đến `######`. Mỗi section Q/A được giữ thành chunk tự nhiên; nếu section quá dài thì fallback sang recursive split và thêm context Markdown path trực tiếp vào content.
 
 ### EmbeddingStore
 
@@ -212,7 +212,7 @@ Cặp low vẫn có score 0.3381, không gần 0 tuyệt đối. Điều này ch
 
 ## 6. Results — Cá nhân (10 điểm)
 
-Benchmark chạy trên `MarkdownStructureChunker(chunk_size=1200)` + `EmbeddingStore` dùng ChromaDB + OpenAI embeddings `text-embedding-3-large`. Tổng số chunks lưu trong vector store: **446**. Metadata filter dùng trong benchmark: `{"doc_id": "viettel_mobile_faqs"}`.
+Benchmark chạy trên `document-structure-chunking` (`MarkdownStructureChunker(chunk_size=1200)`) + `EmbeddingStore` dùng ChromaDB + OpenAI embeddings `text-embedding-3-large`. Tổng số chunks lưu trong vector store: **446**. Metadata filter dùng trong benchmark: `{"doc_id": "viettel_mobile_faqs"}`.
 
 ### Benchmark Queries & Gold Answers (nhóm thống nhất)
 
