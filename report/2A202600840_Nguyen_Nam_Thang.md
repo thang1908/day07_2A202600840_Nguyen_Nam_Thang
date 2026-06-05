@@ -150,7 +150,7 @@ class MarkdownStructureChunker:
 | 2A202600840 - Nguyễn Nam Thắng | document-structure-chunking + metadata filter | 9/10  | Giữ cấu trúc FAQ, nguồn rõ, 5/5 query có chunk đúng trong top-3 | Tạo nhiều chunk hơn recursive baseline; một query cần top-3 mới thấy đủ cú pháp SMS |
 | 2A202600663 - Phạm Huy Cảnh | SentenceChunker + text-embedding-3-small | 9.5/10 | Bảo toàn 100% ngữ cảnh câu và hiểu sâu từ đồng nghĩa tiếng Việt | Phụ thuộc hoàn toàn vào Cloud API, cần mạng và tốn phí |
 | Nguyễn Xuân Tới - 2A202600810 | Recursive (Markdown-aware) + Greedy Merge + all-MiniLM-L6-v2 | 9.5/10 | Separator Markdown-aware bảo toàn ranh giới Q&A; Q2 đạt top-1 score 0.7785 từ `Viettel - Mobile FAQs.md`; Greedy Merge Pass cho chunks khoảng 800 ký tự; 4/5 query đạt STRONG hit; metadata domain lọc chính xác, 4/5 top-1 đúng domain mobile | Q3, Q4 có top-1 score < 0.7 nên semantic distance chưa tách rõ kết quả tốt khỏi nhiễu; cross-domain leak ở Q3 sang domain khác mobile, cần `search_with_filter` để siết |
-| 2A202600575 - Phạm Thị Bích Ngọc |  |  |  |  |
+| Phạm Thị Bích Ngọc (Tôi - 2A202600575) | `Custom QA Chunker` | **9.5/10** | Giữ nguyên vẹn từng cặp Hỏi-Đáp, bảo toàn 100% ngữ cảnh của một cặp FAQ | Kích thước chunk không đồng đều, lệ thuộc vào độ dài mục FAQ gốc. Khuyến nghị kết hợp logic đệ quy cho câu trả lời quá dài |
 
 **Strategy nào tốt nhất cho domain này? Tại sao?**  
 Với bộ FAQ Markdown, strategy document-structure based là phù hợp nhất về mặt thiết kế. Nó tận dụng ranh giới tự nhiên của tài liệu, giữ câu hỏi và câu trả lời gần nhau, đồng thời hỗ trợ metadata/source tracing tốt hơn các baseline.
