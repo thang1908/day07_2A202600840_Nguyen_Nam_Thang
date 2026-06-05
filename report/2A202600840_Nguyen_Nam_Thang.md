@@ -89,12 +89,6 @@ Bộ FAQ Viettel có cấu trúc rõ theo dạng câu hỏi/trả lời, rất p
 
 ### Baseline Analysis
 
-Tôi chạy đúng yêu cầu của Exercise 3.1:
-
-```python
-result = ChunkingStrategyComparator().compare(text, chunk_size=1000)
-```
-
 Số liệu baseline dưới đây lấy từ 3 strategy có sẵn trong comparator: `fixed_size`, `by_sentences`, `recursive`.
 
 | Tài liệu | Strategy | Chunk Count | Avg Length | Preserves Context? |
@@ -138,8 +132,6 @@ class MarkdownStructureChunker:
 
 ### So Sánh: Strategy của tôi vs Baseline
 
-Dòng "best baseline" lấy từ kết quả `ChunkingStrategyComparator().compare()` ở bảng trên. Với cả 3 tài liệu, best baseline là `RecursiveChunker`. Để so sánh công bằng, tôi dùng cùng `chunk_size=1000`.
-
 | Tài liệu | Strategy | Chunk Count | Avg Length | Retrieval Quality? |
 |-----------|----------|-------------|------------|--------------------|
 | MyViettel FAQs | best baseline: RecursiveChunker (`recursive`) | 21 | 889.9 | Ít chunk hơn, nhưng chưa hiểu ranh giới từng câu hỏi FAQ |
@@ -153,7 +145,7 @@ Dòng "best baseline" lấy từ kết quả `ChunkingStrategyComparator().compa
 
 | Thành viên | Strategy | Retrieval Score (/10) | Điểm mạnh | Điểm yếu |
 |-----------|----------|----------------------|-----------|----------|
-| Tôi | MarkdownStructureChunker + metadata filter | 10/10 trên 5 benchmark queries với OpenAI embeddings | Giữ cấu trúc FAQ, nguồn rõ, top-1 đúng cả 5 query | Tạo nhiều chunk hơn recursive baseline |
+| Tôi | MarkdownStructureChunker + metadata filter | 9/10 trên 5 benchmark queries với OpenAI embeddings | Giữ cấu trúc FAQ, nguồn rõ, 5/5 query có chunk đúng trong top-3 | Tạo nhiều chunk hơn recursive baseline; một query cần top-3 mới thấy đủ cú pháp SMS |
 | Thành viên khác | Chưa có dữ liệu nhóm | Chưa đánh giá | Chưa có | Chưa có |
 | Thành viên khác | Chưa có dữ liệu nhóm | Chưa đánh giá | Chưa có | Chưa có |
 
@@ -201,7 +193,6 @@ python3 -m pytest tests/ -q
 
 ## 5. Similarity Predictions — Cá nhân (5 điểm)
 
-Tôi dự đoán trước, sau đó chạy `compute_similarity()` trên OpenAI embeddings (`text-embedding-3-small`).
 
 | Pair | Sentence A | Sentence B | Dự đoán | Actual Score | Đúng? |
 |------|-----------|-----------|---------|--------------|-------|
@@ -218,32 +209,32 @@ Cặp low vẫn có score 0.3381, không gần 0 tuyệt đối. Điều này ch
 
 ## 6. Results — Cá nhân (10 điểm)
 
-Benchmark chạy trên `MarkdownStructureChunker(chunk_size=1200)` + `EmbeddingStore` dùng ChromaDB + OpenAI embeddings `text-embedding-3-small`. Tổng số chunks lưu trong vector store: **446**.
+Benchmark chạy trên `MarkdownStructureChunker(chunk_size=1200)` + `EmbeddingStore` dùng ChromaDB + OpenAI embeddings `text-embedding-3-large`. Tổng số chunks lưu trong vector store: **446**. Metadata filter dùng trong benchmark: `{"doc_id": "viettel_mobile_faqs"}`.
 
 ### Benchmark Queries & Gold Answers (nhóm thống nhất)
 
 | # | Query | Gold Answer |
 |---|-------|-------------|
-| 1 | Tôi dùng BankPlus chuyển tiền nhầm thì có lấy lại tiền được không? | Chỉ lấy lại được khi có sự đồng ý của người nhận; liên hệ tổng đài BankPlus 1900 8099 để được tư vấn. |
-| 2 | Camera Viettel có phân biệt chuyển động giữa người và vật không? | Camera trong nhà cố định và xoay 360 không phân biệt; camera ngoài trời dùng AI để phân biệt người và vật. |
-| 3 | Hóa đơn điện tử là gì? | Là tập hợp thông điệp dữ liệu điện tử về bán hàng/cung ứng dịch vụ, lập và quản lý bằng phương tiện điện tử, ký số, có giá trị pháp lý. |
-| 4 | Truyền hình cáp Viettel có chia được cho nhiều tivi không? | Có thể kéo một đường dây cáp chia cho nhiều tivi; chất lượng hình ảnh vẫn tốt và thuê bao tivi thứ hai trở đi rẻ hơn. |
-| 5 | Tôi không đăng nhập được app MyViettel thì phải làm gì? | Kiểm tra mạng 3G/4G, đăng nhập bằng OTP/3G/4G/mật khẩu hoặc gọi tổng đài hỗ trợ. |
+| 1 | Điện thoại của tôi có sử dụng được 4G hay không? Làm thế nào để nhận biết máy có hỗ trợ 4G? | Các dòng máy như iPhone 5 trở lên, Samsung Galaxy S/Note thường hỗ trợ 4G. Có thể kiểm tra trong phần chế độ mạng xem có 4G/LTE, dùng cú pháp `*098*4#`, My Viettel hoặc web Vietteltelecom.vn. |
+| 2 | Khi đi đổi sim 4G thì nhân viên có thu lại sim cũ của tôi không? | Không bắt buộc thu lại sim cũ khi nâng cấp đổi sim 4G, kể cả đổi sim bảo hành nhưng chọn lý do đổi sim 4G do thay đổi công nghệ. Nếu đổi sim bảo hành theo lý do bảo hành thì vẫn thu lại sim cũ theo quy định. |
+| 3 | Muốn kiểm tra số phút gọi khuyến mãi còn lại thì nhắn tin thế nào? | Soạn tin nhắn `KTLL` gửi `195` miễn phí. |
+| 4 | Làm cách nào để xóa một bài hát nhạc chờ đã cài đặt? | Có thể soạn `XOA<MÃ SỐ BÀI HÁT>` gửi `1221` miễn phí; nếu xóa toàn bộ bộ sưu tập thì soạn `XOASUUTAP` gửi `1221`, rồi `CO` gửi `1221` để xác nhận. Cũng có thể xóa trên web imuzik.com.vn trong bộ sưu tập cá nhân. |
+| 5 | Tôi không muốn dùng 4G nữa, cách hủy gói cước 4G như thế nào? | Nếu muốn hủy gói cước 4G, soạn `HUY` gửi `191`, sau đó xác nhận bằng `Y` gửi `191`. Nếu muốn chuyển về 3G/2G thì hủy gói 4G đang dùng và chọn lại chế độ mạng 3G/2G trên điện thoại, không phải đổi sim. |
 
 ### Kết Quả Của Tôi
 
 | # | Query | Top-1 Retrieved Chunk (tóm tắt) | Score | Relevant? | Agent Answer (tóm tắt) |
 |---|-------|--------------------------------|-------|-----------|------------------------|
-| 1 | BankPlus chuyển tiền nhầm | `Q: Tôi dùng BankPlus để chuyển tiền nhưng bị chuyển nhầm...` | 0.8354 | Có | Chỉ lấy lại được khi người nhận đồng ý; liên hệ 1900 8099. |
-| 2 | Camera phân biệt người/vật | `Q: Các thiết bị Camera có thể phân biệt chuyển động giữa người và vật không?` | 0.6113 | Có | Camera trong nhà không phân biệt; camera ngoài trời có AI phân biệt. |
-| 3 | Hóa đơn điện tử là gì | `Q: Hóa đơn điện tử là gì?` | 0.7335 | Có | Hóa đơn điện tử là dữ liệu điện tử về bán hàng/cung ứng dịch vụ, ký số và có giá trị pháp lý. |
-| 4 | Truyền hình cáp chia nhiều tivi | `Q: Dịch vụ Truyền hình cáp của Viettel có thể chia cho nhiều tivi...` | 0.7722 | Có | Có thể chia một đường dây cáp cho nhiều tivi, chất lượng vẫn tốt. |
-| 5 | Không đăng nhập được MyViettel | `Q: Tôi không đăng nhập được app MyViettel` | 0.8308 | Có | Kiểm tra mạng, đăng nhập bằng OTP/3G/4G/mật khẩu hoặc gọi tổng đài. |
+| 1 | Điện thoại có hỗ trợ 4G không | `Q: Điện thoại của tôi có sử dụng được 4G hay không?...` | 0.7451 | Có | Kiểm tra máy có 4G/LTE trong chế độ mạng, hoặc dùng `*098*4#`, My Viettel, web Vietteltelecom.vn. |
+| 2 | Đổi sim 4G có thu sim cũ không | `Q: Nâng cấp lên sim 4G có phải thu lại sim gốc hay không?` | 0.7193 | Có | Không bắt buộc thu lại sim cũ khi nâng cấp 4G; riêng đổi sim bảo hành theo lý do bảo hành thì vẫn thu sim cũ. |
+| 3 | Kiểm tra phút gọi khuyến mãi | `Q: Làm thế nào để kiểm tra số phút gọi khuyến mãi còn lại?` | 0.7423 | Có | Soạn `KTLL` gửi `195` miễn phí. |
+| 4 | Xóa bài hát nhạc chờ | `Q: Tôi muốn xóa bài hát nhạc chờ?` | 0.6591 | Có | Soạn `XOA<MÃ SỐ BÀI HÁT>` gửi `1221`, hoặc xóa trên imuzik.com.vn trong bộ sưu tập cá nhân. |
+| 5 | Hủy gói cước 4G | `Q: Trường hợp KH muốn hủy dịch vụ 4G không muốn sử dụng nữa...` | 0.7190 | Có | Top-1 nói hủy gói 4G và chuyển mạng 3G/2G; top-3 bổ sung cú pháp `HUY` gửi `191`, rồi `Y` gửi `191`. |
 
 **Bao nhiêu queries trả về chunk relevant trong top-3?** 5 / 5.
 
 **Nhận xét:**  
-Khi dùng OpenAI embeddings và metadata filter hợp lý, top-1 retrieved chunk đúng cả 5 benchmark queries. Metadata filter rất quan trọng: với các query thuộc domain `digital`, nếu chỉ lọc `domain=digital` thì vẫn có thể lẫn MyViettel, BankPlus, Camera; lọc thêm `doc_id` giúp kết quả chính xác hơn.
+Khi dùng OpenAI embeddings và filter đúng file Mobile, 5/5 query đều có chunk relevant trong top-3. Bốn query đầu lấy được câu trả lời trực tiếp ngay ở top-1. Query 5 top-1 đúng ý "không muốn dùng 4G nữa", còn cú pháp SMS `HUY` gửi `191` nằm ở top-3, nên agent cần dùng đủ top-3 context để trả lời đầy đủ.
 
 ---
 
@@ -256,10 +247,10 @@ Chưa có dữ liệu so sánh trực tiếp với thành viên khác tại th�
 Chưa có dữ liệu demo liên nhóm tại thời điểm viết báo cáo. Tôi dự kiến sẽ chú ý cách các nhóm khác thiết kế metadata, vì metadata quyết định rất nhiều đến khả năng filter trước retrieval.
 
 **Failure analysis:**  
-Failure case trước khi dùng filter chi tiết: query "Tôi không đăng nhập được app MyViettel" nếu chỉ search toàn bộ hoặc chỉ lọc `domain=digital` có thể retrieve nhầm sang BankPlus/Camera vì domain digital quá rộng. Nguyên nhân là metadata chưa đủ chi tiết cho các sub-domain. Cải thiện: dùng `doc_id` filter khi biết người dùng đang hỏi MyViettel, hoặc tách `domain=digital` thành `myviettel`, `bankplus`, `camera`.
+Failure case rõ nhất là query "Tôi không muốn dùng 4G nữa, cách hủy gói cước 4G như thế nào?". Top-1 trả về chunk nói cách hủy dịch vụ 4G và chuyển máy về 3G/2G, nhưng chưa có cú pháp SMS; chunk có cú pháp `HUY` gửi `191` đứng top-3. Nguyên nhân là query có hai intent gần nhau: không muốn dùng 4G nữa và hủy gói cước 4G. Cải thiện: tăng `top_k`, rerank theo từ khóa như `HUY`, `191`, hoặc giữ mỗi Q/A ngắn hơn nữa để câu hỏi "Cách hủy gói 4G đang sử dụng?" cạnh tranh tốt hơn.
 
 **Nếu làm lại, tôi sẽ thay đổi gì trong data strategy?**  
-Tôi sẽ chuẩn hóa metadata chi tiết hơn: `service=myviettel/bankplus/camera/mobile/internet_tv/business_invoice`. Tôi cũng sẽ lưu thêm `question_text` riêng trong metadata để hỗ trợ hiển thị và debugging retrieval tốt hơn.
+Tôi vẫn giữ metadata tối giản `doc_id`, `domain`, `source`, `chunk_index` cho ChromaDB vì dễ filter và ít dư thừa. Nếu được mở rộng, tôi sẽ thêm bước reranking hoặc lưu câu hỏi FAQ riêng trong content/chỉ mục phụ để các câu hỏi có cú pháp ngắn như `HUY 191`, `KTLL 195` được ưu tiên chính xác hơn.
 
 ---
 
