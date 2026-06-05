@@ -145,11 +145,11 @@ class MarkdownStructureChunker:
 
 | Thành viên | Strategy | Retrieval Score (/10) | Điểm mạnh | Điểm yếu |
 |-----------|----------|----------------------|-----------|----------|
-| 2A202600934 - Trần Trúc Quỳnh |  |  |  |  |
-| 2A202600855 - Nguyễn Tiến Huân |  |  |  |  |
+| 2A202600934 - Trần Trúc Quỳnh | Q/A pair chunking | 8/10 | Giữ trọn câu hỏi và câu trả lời, dễ grounding | Chunk có thể dài nếu câu trả lời quá dài |
+| 2A202600855 - Nguyễn Tiến Huân | SentenceChunker | 8/10 | Cân bằng ngữ cảnh | Nhiều chunk hơn |
 | 2A202600840 - Nguyễn Nam Thắng | document-structure-chunking + metadata filter | 9/10  | Giữ cấu trúc FAQ, nguồn rõ, 5/5 query có chunk đúng trong top-3 | Tạo nhiều chunk hơn recursive baseline; một query cần top-3 mới thấy đủ cú pháp SMS |
-| 2A202600663 - Phạm Huy Cảnh |  |  |  |  |
-| 2A202600810 - Nguyễn Xuân Tới |  |  |  |  |
+| 2A202600663 - Phạm Huy Cảnh | SentenceChunker + text-embedding-3-small | 9.5/10 | Bảo toàn 100% ngữ cảnh câu và hiểu sâu từ đồng nghĩa tiếng Việt | Phụ thuộc hoàn toàn vào Cloud API, cần mạng và tốn phí |
+| Nguyễn Xuân Tới - 2A202600810 | Recursive (Markdown-aware) + Greedy Merge + all-MiniLM-L6-v2 | 9.5/10 | Separator Markdown-aware bảo toàn ranh giới Q&A; Q2 đạt top-1 score 0.7785 từ `Viettel - Mobile FAQs.md`; Greedy Merge Pass cho chunks khoảng 800 ký tự; 4/5 query đạt STRONG hit; metadata domain lọc chính xác, 4/5 top-1 đúng domain mobile | Q3, Q4 có top-1 score < 0.7 nên semantic distance chưa tách rõ kết quả tốt khỏi nhiễu; cross-domain leak ở Q3 sang domain khác mobile, cần `search_with_filter` để siết |
 | 2A202600575 - Phạm Thị Bích Ngọc |  |  |  |  |
 
 **Strategy nào tốt nhất cho domain này? Tại sao?**  
