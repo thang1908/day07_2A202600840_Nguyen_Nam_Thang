@@ -32,52 +32,45 @@ METADATA_BY_SOURCE = {
         "doc_id": "viettel_business_service_faqs",
         "domain": "business",
         "source": "Viettel - Business Service FAQs.md",
-        "language": "vi",
     },
     "Viettel - Digital Application FAQs.md": {
         "doc_id": "viettel_digital_application_faqs",
         "domain": "digital",
         "source": "Viettel - Digital Application FAQs.md",
-        "language": "vi",
     },
     "Viettel - Internet - TV FAQs.md": {
         "doc_id": "viettel_internet_tv_faqs",
         "domain": "internet",
         "source": "Viettel - Internet - TV FAQs.md",
-        "language": "vi",
     },
     "Viettel - Mobile FAQs.md": {
         "doc_id": "viettel_mobile_faqs",
         "domain": "mobile",
         "source": "Viettel - Mobile FAQs.md",
-        "language": "vi",
     },
     "Viettel - MyViettel FAQs.md": {
         "doc_id": "viettel_myviettel_faqs",
         "domain": "digital",
         "source": "Viettel - MyViettel FAQs.md",
-        "language": "vi",
     },
     "Viettel - Shop Viettet FAQs.md": {
         "doc_id": "viettel_shop_faqs",
         "domain": "shop",
         "source": "Viettel - Shop Viettet FAQs.md",
-        "language": "vi",
     },
 }
 
 
 def build_metadata_for_path(path: Path) -> dict:
     """Build metadata for one input file."""
-    base_metadata = {
-        "source": path.name,
-        "extension": path.suffix.lower(),
-        "path": str(path),
-    }
-    return {
-        **base_metadata,
-        **METADATA_BY_SOURCE.get(path.name, {}),
-    }
+    return METADATA_BY_SOURCE.get(
+        path.name,
+        {
+            "doc_id": path.stem,
+            "domain": "unknown",
+            "source": path.name,
+        },
+    )
 
 
 def load_documents_from_files(file_paths: list[str]) -> list[Document]:

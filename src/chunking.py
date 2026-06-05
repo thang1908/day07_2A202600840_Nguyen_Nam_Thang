@@ -190,13 +190,11 @@ class MarkdownStructureChunker:
         index: int,
         base_metadata: dict,
     ) -> dict:
-        doc_id = base_metadata.get("doc_id", "document")
         metadata = {
-            **base_metadata,
+            "doc_id": base_metadata.get("doc_id", "document"),
+            "domain": base_metadata.get("domain", "unknown"),
+            "source": base_metadata.get("source", ""),
             "chunk_index": index,
-            "chunk_id": f"{doc_id}_chunk_{index}",
-            "heading_path": " > ".join(heading_path),
-            "section_title": heading_path[-1] if heading_path else "",
         }
         return {"content": chunk.strip(), "metadata": metadata}
 

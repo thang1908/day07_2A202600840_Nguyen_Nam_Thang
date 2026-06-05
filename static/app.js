@@ -219,7 +219,7 @@ function addChatMessage(role, text, sources = []) {
     sources.slice(0, 3).forEach((source) => {
       const sourceNode = document.createElement("div");
       sourceNode.className = "chat-source";
-      sourceNode.textContent = `#${source.rank} ${source.source || source.doc_id || "source"} · ${source.section_title || ""}`;
+      sourceNode.textContent = `#${source.rank} ${source.source || source.doc_id || "source"} · chunk ${source.chunk_index ?? ""}`;
       sourceList.appendChild(sourceNode);
     });
     node.appendChild(sourceList);
@@ -245,7 +245,7 @@ function renderResults(results) {
     const card = document.createElement("article");
     card.className = "result-card";
 
-    const title = metadata.section_title || metadata.heading_path || metadata.source || "Untitled chunk";
+    const title = `${metadata.source || "Untitled source"} · chunk ${metadata.chunk_index ?? ""}`;
     card.innerHTML = `
       <div class="result-meta">
         <span class="pill">#${item.rank}</span>

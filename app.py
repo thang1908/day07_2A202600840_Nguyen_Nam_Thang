@@ -166,7 +166,7 @@ def chat_with_knowledge_base(request: ChatRequest) -> dict[str, Any]:
                 "score": result["score"],
                 "source": result["metadata"].get("source"),
                 "doc_id": result["metadata"].get("doc_id"),
-                "section_title": result["metadata"].get("section_title"),
+                "chunk_index": result["metadata"].get("chunk_index"),
             }
             for index, result in enumerate(results, start=1)
         ],
@@ -235,9 +235,11 @@ def build_answer_prompt(question: str, results: list[dict[str, Any]]) -> str:
     for index, result in enumerate(results, start=1):
         metadata = result.get("metadata", {})
         source = metadata.get("source") or metadata.get("doc_id") or result.get("id", "unknown")
-        section = metadata.get("section_title") or metadata.get("heading_path") or ""
         context_blocks.append(
-            f"[{index}] Source: {source}\nSection: {section}\nScore: {result['score']:.4f}\n{result['content']}"
+            f"[{index}] Source: {source}\n"
+            f"Chunk index: {metadata.get('chunk_index', '')}\n"
+            f"Score: {result['score']:.4f}\n"
+            f"{result['content']}"
         )
 
     context = "\n\n".join(context_blocks) if context_blocks else "No relevant context was found."
@@ -266,7 +268,7 @@ def load_chunk_documents(request: IndexRequest) -> list[Document]:
             metadata = record["metadata"]
             documents.append(
                 Document(
-                    id=metadata["chunk_id"],
+                    id=make_chunk_document_id(metadata),
                     content=record["content"],
                     metadata=metadata,
                 )
@@ -298,14 +300,17 @@ def chunk_content(
     records = []
     for index, chunk in enumerate(chunks):
         metadata = {
-            **base_metadata,
+            "doc_id": doc_id,
+            "domain": base_metadata.get("domain", "unknown"),
+            "source": base_metadata.get("source", ""),
             "chunk_index": index,
-            "chunk_id": f"{doc_id}_chunk_{index}",
-            "heading_path": "",
-            "section_title": "",
         }
         records.append({"content": chunk, "metadata": metadata})
     return records
+
+
+def make_chunk_document_id(metadata: dict[str, Any]) -> str:
+    return f"{metadata.get('doc_id', 'document')}_chunk_{metadata.get('chunk_index', 0)}"
 
 
 def status_payload() -> dict[str, Any]:

@@ -61,18 +61,18 @@ Số chunk tăng từ 23 lên 25 vì bước nhảy giữa các chunk nhỏ hơn
 **Domain:** Viettel customer support FAQ, gồm MyViettel, Mobile, Internet-TV, Digital Application, Business Service và Shop.
 
 **Tại sao nhóm chọn domain này?**  
-Bộ FAQ Viettel có cấu trúc rõ theo dạng câu hỏi/trả lời, rất phù hợp để thử nghiệm RAG và vector retrieval. Tài liệu có nhiều nhóm dịch vụ khác nhau nên metadata như `domain`, `doc_id`, `source`, `language` có thể giúp giảm nhiễu khi search. Ngoài ra dữ liệu tiếng Việt cũng giúp kiểm tra rõ sự khác biệt giữa mock embeddings và embeddings thật.
+Bộ FAQ Viettel có cấu trúc rõ theo dạng câu hỏi/trả lời, rất phù hợp để thử nghiệm RAG và vector retrieval. Tài liệu có nhiều nhóm dịch vụ khác nhau nên metadata tối giản như `domain`, `doc_id`, `source`, `chunk_index` có thể giúp giảm nhiễu khi search mà không làm record quá rối.
 
 ### Data Inventory
 
 | # | Tên tài liệu | Nguồn | Số ký tự | Metadata đã gán |
 |---|--------------|-------|----------|-----------------|
-| 1 | Viettel - Business Service FAQs.md | Local `data/` | 42,513 | `doc_id=viettel_business_service_faqs`, `domain=business`, `language=vi` |
-| 2 | Viettel - Digital Application FAQs.md | Local `data/` | 13,724 | `doc_id=viettel_digital_application_faqs`, `domain=digital`, `language=vi` |
-| 3 | Viettel - Internet - TV FAQs.md | Local `data/` | 67,696 | `doc_id=viettel_internet_tv_faqs`, `domain=internet`, `language=vi` |
-| 4 | Viettel - Mobile FAQs.md | Local `data/` | 66,587 | `doc_id=viettel_mobile_faqs`, `domain=mobile`, `language=vi` |
-| 5 | Viettel - MyViettel FAQs.md | Local `data/` | 18,992 | `doc_id=viettel_myviettel_faqs`, `domain=digital`, `language=vi` |
-| 6 | Viettel - Shop Viettet FAQs.md | Local `data/` | 4,452 | `doc_id=viettel_shop_faqs`, `domain=shop`, `language=vi` |
+| 1 | Viettel - Business Service FAQs.md | Local `data/` | 42,513 | `doc_id=viettel_business_service_faqs`, `domain=business`, `source=Viettel - Business Service FAQs.md` |
+| 2 | Viettel - Digital Application FAQs.md | Local `data/` | 13,724 | `doc_id=viettel_digital_application_faqs`, `domain=digital`, `source=Viettel - Digital Application FAQs.md` |
+| 3 | Viettel - Internet - TV FAQs.md | Local `data/` | 67,696 | `doc_id=viettel_internet_tv_faqs`, `domain=internet`, `source=Viettel - Internet - TV FAQs.md` |
+| 4 | Viettel - Mobile FAQs.md | Local `data/` | 66,587 | `doc_id=viettel_mobile_faqs`, `domain=mobile`, `source=Viettel - Mobile FAQs.md` |
+| 5 | Viettel - MyViettel FAQs.md | Local `data/` | 18,992 | `doc_id=viettel_myviettel_faqs`, `domain=digital`, `source=Viettel - MyViettel FAQs.md` |
+| 6 | Viettel - Shop Viettet FAQs.md | Local `data/` | 4,452 | `doc_id=viettel_shop_faqs`, `domain=shop`, `source=Viettel - Shop Viettet FAQs.md` |
 
 ### Metadata Schema
 
@@ -81,10 +81,7 @@ Bộ FAQ Viettel có cấu trúc rõ theo dạng câu hỏi/trả lời, rất p
 | `doc_id` | string | `viettel_myviettel_faqs` | Lọc chính xác theo tài liệu gốc, hữu ích khi domain còn quá rộng. |
 | `domain` | string | `digital`, `internet`, `business` | Giới hạn search trong đúng nhóm dịch vụ. |
 | `source` | string | `Viettel - MyViettel FAQs.md` | Truy vết câu trả lời về file gốc. |
-| `language` | string | `vi` | Hữu ích nếu sau này có dữ liệu nhiều ngôn ngữ. |
-| `chunk_id` | string | `viettel_myviettel_faqs_chunk_0` | Định danh từng chunk trong vector store. |
-| `heading_path` | string | `Viettel - MyViettel FAQs > Q: ...` | Giữ context cấu trúc Markdown/FAQ. |
-| `section_title` | string | `Q: Tôi không đăng nhập được app MyViettel` | Hiển thị nguồn ngắn gọn trong UI/chat. |
+| `chunk_index` | integer | `0` | Biết thứ tự chunk trong tài liệu gốc và tạo `Document.id` dạng `doc_id_chunk_index`. |
 
 ---
 
@@ -117,10 +114,10 @@ Số liệu baseline dưới đây lấy từ 3 strategy có sẵn trong compara
 **Loại:** Custom strategy - `MarkdownStructureChunker`
 
 **Mô tả cách hoạt động:**  
-Strategy này tách Markdown theo heading `#`, `##`, `###` trước. Với FAQ Viettel, mỗi câu hỏi thường là heading `### Q: ...`, câu trả lời nằm ngay bên dưới. Vì vậy mỗi section Q/A được giữ thành một chunk tự nhiên. Nếu section quá dài so với `chunk_size`, strategy fallback sang `RecursiveChunker` nhưng vẫn thêm context `[Markdown path: ...]`.
+Strategy này tách Markdown theo heading `#`, `##`, `###` trước. Với FAQ Viettel, mỗi câu hỏi thường là heading `### Q: ...`, câu trả lời nằm ngay bên dưới. Vì vậy mỗi section Q/A được giữ thành một chunk tự nhiên. Nếu section quá dài so với `chunk_size`, strategy fallback sang `RecursiveChunker` nhưng vẫn thêm dòng context `[Markdown path: ...]` vào content của subchunk.
 
 **Tại sao tôi chọn strategy này cho domain nhóm?**  
-Domain FAQ có cấu trúc tài liệu rất rõ, nên chunk theo heading sẽ phù hợp hơn chunk theo kích thước thuần. Strategy này giúp chunk giữ trọn ý câu hỏi/trả lời, đồng thời metadata `heading_path` và `section_title` giúp trace kết quả trong UI/chat.
+Domain FAQ có cấu trúc tài liệu rất rõ, nên chunk theo heading sẽ phù hợp hơn chunk theo kích thước thuần. Strategy này giúp chunk giữ trọn ý câu hỏi/trả lời; metadata được giữ tối giản để phục vụ filter và trace nguồn.
 
 **Code snippet (custom):**
 ```python
@@ -150,7 +147,7 @@ Dòng "best baseline" lấy từ kết quả `ChunkingStrategyComparator().compa
 | Mobile FAQs | best baseline: RecursiveChunker (`recursive`) | 76 | 864.6 | Cân bằng, nhưng có thể gom nhiều Q/A vào cùng chunk |
 | Mobile FAQs | **của tôi: MarkdownStructureChunker** | 150 | 463.1 | Nhiều chunk hơn, nhưng mỗi chunk gần với một Q/A nên dễ truy vết |
 | Internet-TV FAQs | best baseline: RecursiveChunker (`recursive`) | 79 | 848.0 | Tốt cho đoạn dài, nhưng không gắn section title |
-| Internet-TV FAQs | **của tôi: MarkdownStructureChunker** | 149 | 489.8 | Trace source tốt hơn nhờ `heading_path`, phù hợp khi cần hiển thị nguồn |
+| Internet-TV FAQs | **của tôi: MarkdownStructureChunker** | 149 | 489.8 | Trace source bằng `source` và `chunk_index`, phù hợp khi cần hiển thị nguồn tối giản |
 
 ### So Sánh Với Thành Viên Khác
 
@@ -176,7 +173,7 @@ Tôi dùng regex `(?<=[.!?])\s+` để tách câu theo dấu kết thúc câu r�
 Thuật toán thử separator theo thứ tự `\n\n`, `\n`, `. `, space, rồi fallback fixed-size. Base case là text rỗng hoặc độ dài nhỏ hơn `chunk_size`. Nếu một phần vẫn quá dài, hàm gọi đệ quy với separator nhỏ hơn.
 
 **`MarkdownStructureChunker` — approach:**  
-Tôi thêm custom chunker cho Markdown bằng cách parse heading `#` đến `######`. Mỗi section được giữ nguyên heading path; nếu section quá dài thì fallback sang recursive split nhưng vẫn thêm context Markdown path vào chunk.
+Tôi thêm custom chunker cho Markdown bằng cách parse heading `#` đến `######`. Mỗi section Q/A được giữ thành chunk tự nhiên; nếu section quá dài thì fallback sang recursive split và thêm context Markdown path trực tiếp vào content.
 
 ### EmbeddingStore
 
