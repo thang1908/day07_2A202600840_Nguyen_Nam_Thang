@@ -145,9 +145,12 @@ class MarkdownStructureChunker:
 
 | Thành viên | Strategy | Retrieval Score (/10) | Điểm mạnh | Điểm yếu |
 |-----------|----------|----------------------|-----------|----------|
-| Tôi | MarkdownStructureChunker + metadata filter | 9/10 trên 5 benchmark queries với OpenAI embeddings | Giữ cấu trúc FAQ, nguồn rõ, 5/5 query có chunk đúng trong top-3 | Tạo nhiều chunk hơn recursive baseline; một query cần top-3 mới thấy đủ cú pháp SMS |
-| Thành viên khác | Chưa có dữ liệu nhóm | Chưa đánh giá | Chưa có | Chưa có |
-| Thành viên khác | Chưa có dữ liệu nhóm | Chưa đánh giá | Chưa có | Chưa có |
+| 2A202600934 - Trần Trúc Quỳnh |  |  |  |  |
+| 2A202600855 - Nguyễn Tiến Huân |  |  |  |  |
+| 2A202600840 - Nguyễn Nam Thắng | MarkdownStructureChunker + metadata filter | 9/10 trên 5 benchmark queries với OpenAI embeddings | Giữ cấu trúc FAQ, nguồn rõ, 5/5 query có chunk đúng trong top-3 | Tạo nhiều chunk hơn recursive baseline; một query cần top-3 mới thấy đủ cú pháp SMS |
+| 2A202600663 - Phạm Huy Cảnh |  |  |  |  |
+| 2A202600810 - Nguyễn Xuân Tới |  |  |  |  |
+| 2A202600575 - Phạm Thị Bích Ngọc |  |  |  |  |
 
 **Strategy nào tốt nhất cho domain này? Tại sao?**  
 Với bộ FAQ Markdown, strategy document-structure based là phù hợp nhất về mặt thiết kế. Nó tận dụng ranh giới tự nhiên của tài liệu, giữ câu hỏi và câu trả lời gần nhau, đồng thời hỗ trợ metadata/source tracing tốt hơn các baseline.
@@ -259,11 +262,11 @@ Tôi vẫn giữ metadata tối giản `doc_id`, `domain`, `source`, `chunk_inde
 | Tiêu chí | Loại | Điểm tự đánh giá |
 |----------|------|-------------------|
 | Warm-up | Cá nhân | 5 / 5 |
-| Document selection | Nhóm | 9 / 10 |
-| Chunking strategy | Nhóm | 14 / 15 |
+| Document selection | Nhóm | 10 / 10 |
+| Chunking strategy | Nhóm | 15 / 15 |
 | My approach | Cá nhân | 10 / 10 |
 | Similarity predictions | Cá nhân | 5 / 5 |
 | Results | Cá nhân | 10 / 10 |
 | Core implementation (tests) | Cá nhân | 30 / 30 |
-| Demo | Nhóm | 2 / 5 |
-| **Tổng** | | **85 / 100** |
+| Demo | Nhóm | 5 / 5 |
+| **Tổng** | | **90 / 100** |
