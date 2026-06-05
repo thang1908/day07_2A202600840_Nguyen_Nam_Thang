@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Viettel FAQ Retrieval</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Embedding & Vector Store Lab</p>
+        <h1>Viettel FAQ Retrieval</h1>
+      </div>
+      <button class="ghost-button" id="refreshBtn" type="button">Refresh</button>
+    </header>
+
+    <section class="workspace">
+      <aside class="control-panel">
+        <section class="panel">
+          <div class="panel-heading">
+            <span class="step">1</span>
+            <div>
+              <h2>Build Index</h2>
+              <p>Load Markdown files, chunk, embed, then write vectors.</p>
+            </div>
+          </div>
+
+          <label>
+            Chunking method
+            <select id="chunkMethod">
+              <option value="markdown">Markdown structure</option>
+              <option value="recursive">Recursive</option>
+              <option value="fixed">Fixed size</option>
+              <option value="sentence">Sentence</option>
+            </select>
+          </label>
+          <p class="method-hint" id="methodHint"></p>
+
+          <div class="split">
+            <label class="chunk-setting" data-methods="markdown recursive fixed">
+              Chunk size
+              <input id="chunkSize" type="number" min="200" max="6000" value="1200">
+            </label>
+            <label class="chunk-setting" data-methods="fixed">
+              Overlap
+              <input id="overlap" type="number" min="0" max="1000" value="100">
+            </label>
+          </div>
+
+          <label class="chunk-setting" data-methods="sentence">
+            Max sentences
+            <input id="maxSentences" type="number" min="1" max="20" value="3">
+          </label>
+
+          <button id="buildBtn" type="button">Build Vector Index</button>
+          <p class="notice" id="buildNotice"></p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <span class="step">2</span>
+            <div>
+              <h2>Index Status</h2>
+              <p>Current backend and vector index state.</p>
+            </div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <span>Embedding</span>
+              <strong id="embeddingBackend">-</strong>
+            </div>
+            <div class="metric">
+              <span>Vector DB</span>
+              <strong id="vectorDb">-</strong>
+            </div>
+            <div class="metric">
+              <span>Chunks</span>
+              <strong id="totalChunks">0</strong>
+            </div>
+            <div class="metric">
+              <span>Strategy</span>
+              <strong id="strategy">-</strong>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="query-panel">
+        <div class="panel-heading query-heading">
+          <span class="step">3</span>
+          <div>
+            <h2>Query Knowledge Base</h2>
+            <p>Search top chunks with optional metadata filters.</p>
+          </div>
+        </div>
+
+        <label>
+          Question
+          <textarea id="question">Tôi không đăng nhập được app MyViettel thì phải làm gì?</textarea>
+        </label>
+
+        <div class="query-grid">
+          <label>
+            Domain filter
+            <select id="domainFilter">
+              <option value="">All domains</option>
+            </select>
+          </label>
+          <label>
+            Document filter
+            <select id="docFilter">
+              <option value="">All documents</option>
+            </select>
+          </label>
+          <label>
+            Top K
+            <input id="topK" type="number" min="1" max="20" value="5">
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="queryBtn" type="button">Search</button>
+          <p class="notice" id="queryNotice"></p>
+        </div>
+
+        <div class="results" id="results">
+          <div class="empty-state">
+            Build the vector index, then run a query to inspect retrieved chunks.
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <button class="chat-launcher" id="chatToggle" type="button" aria-expanded="false">
+    Chat
+  </button>
+
+  <section class="chat-widget" id="chatWidget" hidden>
+    <header class="chat-header">
+      <div>
+        <h2>RAG Chat</h2>
+        <p>Ask with retrieved context injected into the LLM.</p>
+      </div>
+      <button class="chat-close" id="chatClose" type="button" aria-label="Close chat">×</button>
+    </header>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-message assistant">
+        Build the vector index first, then ask me about Viettel FAQs.
+      </div>
+    </div>
+
+    <form class="chat-form" id="chatForm">
+      <textarea id="chatInput" placeholder="Nhập câu hỏi..." rows="2">Tôi không đăng nhập được app MyViettel thì phải làm gì?</textarea>
+      <button id="chatSendBtn" type="submit">Send</button>
+    </form>
+    <p class="notice chat-notice" id="chatNotice"></p>
+  </section>
+
+  <script src="{{ url_for('static', path='app.js') }}"></script>
+</body>
+</html>
